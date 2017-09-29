@@ -152,12 +152,12 @@ public class TimeSlotResource1_9 extends DataDelegatingCrudResource<TimeSlot> {
 
 		if (includeFull) {
 			return new NeedsPaging<TimeSlot>(
-			        Context.getService(AppointmentService.class).getTimeSlotsByConstraintsIncludingFull(appointmentType,
+			        Context.getService(AppointmentService.class).getTimeSlotsBySoftConstraintsIncludingFull(appointmentType,
                             startDate, endDate, provider, location, patient), context);
 		}
 		else {
 			return new NeedsPaging<TimeSlot>(
-					Context.getService(AppointmentService.class).getTimeSlotsByConstraints(appointmentType,
+					Context.getService(AppointmentService.class).getTimeSlotsBySoftConstraints(appointmentType,
 							startDate, endDate, provider, location, patient), context);
 		}
 		

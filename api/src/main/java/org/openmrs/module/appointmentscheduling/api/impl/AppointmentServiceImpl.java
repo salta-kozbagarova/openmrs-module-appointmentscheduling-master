@@ -676,6 +676,8 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 //    				}
                     availableTimeSlots.add(slot);
             }
+        } else{
+        	availableTimeSlots = suitableTimeSlots;
         }
         
         return availableTimeSlots;
