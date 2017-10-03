@@ -657,10 +657,10 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 
 	@Override
 	public List<TimeSlot> getTimeSlotsBySoftConstraints(AppointmentType appointmentType, Date fromDate, Date toDate,
-			Provider provider, Location location, Patient excludeTimeSlotsWithPatient) throws APIException {
+			Provider provider, Location location, Patient excludeTimeSlotsWithPatient, Boolean excludeAllBooked) throws APIException {
 		
 		List<TimeSlot> suitableTimeSlots = getTimeSlotsBySoftConstraintsIncludingFull(
-                appointmentType, fromDate, toDate, provider, location, excludeTimeSlotsWithPatient);
+                appointmentType, fromDate, toDate, provider, location, excludeTimeSlotsWithPatient, excludeAllBooked);
 
         List<TimeSlot> availableTimeSlots = new LinkedList<TimeSlot>();
 
@@ -759,12 +759,12 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 	@Override
 	public List<TimeSlot> getTimeSlotsBySoftConstraintsIncludingFull(AppointmentType appointmentType, Date fromDate,
 			Date toDate, Provider provider, Location location) throws APIException {
-		return getTimeSlotsBySoftConstraintsIncludingFull(appointmentType, fromDate, toDate, provider, location, null);
+		return getTimeSlotsBySoftConstraintsIncludingFull(appointmentType, fromDate, toDate, provider, location, null, false);
 	}
 
 	@Override
 	public List<TimeSlot> getTimeSlotsBySoftConstraintsIncludingFull(AppointmentType appointmentType, Date fromDate,
-			Date toDate, Provider provider, Location location, Patient excludeTimeSlotsWithPatient)
+			Date toDate, Provider provider, Location location, Patient excludeTimeSlotsWithPatient, Boolean excludeAllBooked)
 			throws APIException {
 		List<TimeSlot> suitableTimeSlots = getTimeSlotDAO().getTimeSlotsBySoftConstraints(appointmentType, fromDate, toDate, provider);
 
@@ -782,14 +782,27 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 
         Set<TimeSlot> timeSlotsToExclude = new HashSet<TimeSlot>();
 
-        // generate the set of time slots to exclude that the specified patient already has an appointment for of the specified type
-        if (excludeTimeSlotsWithPatient != null) {
+		if(excludeAllBooked){
+			for (TimeSlot slot : suitableTimeSlots) {
+				for (Appointment appointment : getAppointmentsInTimeSlotThatAreNotCancelled(slot)) {
+					timeSlotsToExclude.add(appointment.getTimeSlot());
+				}
+			}
+		} else if(excludeTimeSlotsWithPatient != null) {
             for (Appointment appointment: getAppointmentsOfPatient(excludeTimeSlotsWithPatient)) {
                 if (((appointmentType != null && appointment.getAppointmentType() == appointmentType) || appointmentType == null) && appointment.getStatus().getType() != Appointment.AppointmentStatusType.CANCELLED) {
                     timeSlotsToExclude.add(appointment.getTimeSlot());
                 }
             }
         }
+        /*// generate the set of time slots to exclude that the specified patient already has an appointment for of the specified type
+        if (excludeTimeSlotsWithPatient != null) {
+            for (Appointment appointment: getAppointmentsOfPatient(excludeTimeSlotsWithPatient)) {
+                if (((appointmentType != null && appointment.getAppointmentType() == appointmentType) || appointmentType == null) && appointment.getStatus().getType() != Appointment.AppointmentStatusType.CANCELLED) {
+                    timeSlotsToExclude.add(appointment.getTimeSlot());
+                }
+            }
+        }*/
 
         // now do the actual filtering
         for (TimeSlot slot : suitableTimeSlots) {

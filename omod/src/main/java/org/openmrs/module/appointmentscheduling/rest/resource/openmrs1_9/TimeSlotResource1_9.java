@@ -146,6 +146,9 @@ public class TimeSlotResource1_9 extends DataDelegatingCrudResource<TimeSlot> {
 		Boolean includeFull = context.getParameter("includeFull") != null ? (Boolean) ConversionUtil.convert(
 		    context.getParameter("includeFull"), Boolean.class) : false;
 		
+	    Boolean excludeAllBooked = context.getParameter("excludeAllBooked") != null ? (Boolean) ConversionUtil.convert(
+			    context.getParameter("excludeAllBooked"), Boolean.class) : false;
+		        
 		Patient patient = context.getParameter("excludeTimeSlotsPatientAlreadyBookedFor") != null ? Context
 		        .getPatientService().getPatientByUuid(context.getParameter("excludeTimeSlotsPatientAlreadyBookedFor"))
 		        : null;
@@ -153,12 +156,12 @@ public class TimeSlotResource1_9 extends DataDelegatingCrudResource<TimeSlot> {
 		if (includeFull) {
 			return new NeedsPaging<TimeSlot>(
 			        Context.getService(AppointmentService.class).getTimeSlotsBySoftConstraintsIncludingFull(appointmentType,
-                            startDate, endDate, provider, location, patient), context);
+                            startDate, endDate, provider, location, patient, excludeAllBooked), context);
 		}
 		else {
 			return new NeedsPaging<TimeSlot>(
 					Context.getService(AppointmentService.class).getTimeSlotsBySoftConstraints(appointmentType,
-							startDate, endDate, provider, location, patient), context);
+							startDate, endDate, provider, location, patient, excludeAllBooked), context);
 		}
 		
 	}

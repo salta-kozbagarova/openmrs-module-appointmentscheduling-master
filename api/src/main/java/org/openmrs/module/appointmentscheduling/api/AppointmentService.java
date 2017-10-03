@@ -827,7 +827,7 @@ public interface AppointmentService extends OpenmrsService {
     @Authorized(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS)
 	List<TimeSlot> getTimeSlotsBySoftConstraints(AppointmentType appointmentType,
 									            Date fromDate, Date toDate, Provider provider, Location location,
-									            Patient excludeTimeSlotsWithPatient)
+									            Patient excludeTimeSlotsWithPatient, Boolean excludeAllBooked)
 			throws APIException;
 
 //	/**
@@ -893,7 +893,7 @@ public interface AppointmentService extends OpenmrsService {
     @Authorized(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS)
     List<TimeSlot> getTimeSlotsBySoftConstraintsIncludingFull(
             AppointmentType appointmentType, Date fromDate, Date toDate,
-            Provider provider, Location location, Patient excludeTimeSlotsWithPatient) throws APIException;
+            Provider provider, Location location, Patient excludeTimeSlotsWithPatient, Boolean excludeAllBooked) throws APIException;
 
 	/**
 	 * Returns a list of strings, where each string represents an identifier of the given patient
